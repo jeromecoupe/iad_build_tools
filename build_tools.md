@@ -37,7 +37,7 @@ Nous devrons également installer un certain nombre de packages NPM utilisés pa
 - `npm install [package(s)]` ou `npm i [package(s)]`: installe les packages nécessaires en production
 - `npm install [package(s)] --save-dev` ou `npm i -D [package(s)]`: installe les packages nécessaires uniquement en développement local et pour des tests
 
-**Exemple: la commande `NPM i -D browser-sync` installera BrowserSync comme dépendance de développement et spécifiera une plage des versions de ce package pouvant être utilisées dans le fichier `package.json`.**
+*Exemple: la commande `NPM i -D browser-sync` installera BrowserSync comme dépendance de développement et spécifiera une plage des versions de ce package pouvant être utilisées dans le fichier `package.json`.*
 
 - `npm uninstall [package(s)]`: vous permet de désinstaller un ou plusieurs packages NPM.
 - `npm outdated` ou `npm outdated [package(s)]`: vous permet de voir quelle est la dernière version stable d'un ou plusieurs packages installés
@@ -54,7 +54,7 @@ La propriété [`scripts`](https://docs.npmjs.com/cli/v7/using-npm/scripts) du f
 }
 ```
 
-**Exemple: le script ci-dessus pourra être exécuté avec la commande `npm run styles` et aura pour effet de compiler le contenu du fichier source `main.scss` vers le fichier de destination `main.css`**
+*Exemple: le script ci-dessus pourra être exécuté avec la commande `npm run styles` et aura pour effet de compiler le contenu du fichier source `main.scss` vers le fichier de destination `main.css`*
 
 NPM offre des commandes courtes pour certains scripts très utilisés:
 
@@ -96,9 +96,9 @@ Typiquement, `styles:prod` sera exécuté lors du passage en production, tandis 
 
 Nous allons maintenant créer ensemble un asset pipeline assez classique qui devra remplir les missions suivantes:
 
-- Compiler du code Sass en un seul fichier CSS, utiliser postCSS et les plugins autoprefixer et cssnano pour ajouter les vendor prefixes et minifier la css finale.
-- Bundler nos modules JavaScript en un seul fichier et transpiler le tout vers de l'ES6
-- Optimiser nos images et utiliser un script externe et la librairie Sharp pour générer des thumbnails aux dimensions et formats voulus.
+- Compiler du code [Sass](https://sass-lang.com) en un seul fichier CSS, utiliser [postCSS](https://postcss.org/) et les plugins [autoprefixer](https://github.com/postcss/autoprefixer) et [cssnano](https://github.com/cssnano/cssnano) pour ajouter les vendor prefixes et minifier la css finale.
+- Bundler nos modules JavaScript en un seul fichier et transpiler le tout vers de l'ES6 avec [esbuild](https://esbuild.github.io/)
+- Optimiser nos images et utiliser un script externe et la librairie [Sharp](https://github.com/lovell/sharp) pour générer des thumbnails aux dimensions et formats voulus.
 
 ### Pipeline CSS
 
