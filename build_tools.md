@@ -83,9 +83,23 @@ Pour cela, j'utilise personnellement la notation suivante:
 
 ```json
 {
+  "name": "npm-scripts",
+  "version": "1.0.0",
+  "description": "Learning NPM scripts",
   "scripts": {
-    "styles:prod": "sass src/assets/scss/main.scss dist/assets/css/main.css --no-source-map --style=compressed",
-    "styles:dev": "sass src/assets/scss/main.scss dist/assets/css/main.css --embed-source-map --source-map-urls=absolute"
+    "styles:dev": "sass --watch --embed-source-map --source-map-urls=absolute \"src/scss/main.scss\" \"dist/css/styles.css\"",
+    "styles:prod": "sass --no-source-map \"src/scss/main.scss\" \"dist/css/styles.css\"",
+  },
+  "keywords": [
+    "NPM Scripts",
+    "asset pipeline",
+    "build",
+    "watch"
+  ],
+  "author": "Jérôme Coupé",
+  "license": "MIT",
+  "devDependencies": {
+    "sass": "^1.43.4"
   }
 }
 ```
@@ -100,26 +114,128 @@ Nous allons maintenant créer ensemble un asset pipeline assez classique qui dev
 - Bundler nos modules JavaScript en un seul fichier et transpiler le tout vers de l'ES6 avec [esbuild](https://esbuild.github.io/)
 - Optimiser nos images et utiliser un script externe et la librairie [Sharp](https://github.com/lovell/sharp) pour générer des thumbnails aux dimensions et formats voulus.
 
-### Pipeline CSS
+### Pipeline Sass / PostCSS
 
-- Sass
-- PostCSS
+Voyons maintenant comment ajouter un pipeline Sass à notre projet:
+
+Installer les packages NPM Sass et PostCSS, ainsi que les plugins autoprefixer et cssnano:
+
+- `npm install --save-dev sass postcss-cli autoprefixer cssnano`
+- `npm i -D sass sass postcss-cli autoprefixer cssnano`
+
+En développement, nous devons compiler notre code Scss et obtenir une css avec sourcemaps.
+
+En production, nous devons également compiler notre code Scss et obtenir un fichier CSS sans sourcemaps. Nous devons ensuite ajouter nos vendor prefixes et compresser notre fichier CSS avec [PostCSS et postCSS CLI](https://github.com/postcss/postcss), autoprefixer et cssnano.
+
+```json
+"scripts": {
+  "styles:dev": "sass --embed-source-map --source-map-urls=absolute src/scss/main.scss dist/css/styles.css",
+  "styles:prod": "sass --no-source-map src/scss/main.scss dist/css/styles.css",
+  "poststyles:prod": "postcss \"dist/css/styles.css\" --replace --no-map --use autoprefixer cssnano",
+},
+```
+
+Autoprefixer ayant besoin de savoir quels navigateurs et quelles versions supporter, nous pouvons ajouter une [query browserslist](https://github.com/browserslist/browserslist) à notre `package.json`. Voici celle que j'utilise habituellement.
+
+
+```json
+"scripts": {
+  "styles:dev": "sass --embed-source-map --source-map-urls=absolute src/scss/main.scss dist/css/styles.css",
+  "styles:prod": "sass --no-source-map src/scss/main.scss dist/css/styles.css",
+  "poststyles:prod": "postcss \"dist/css/styles.css\" --replace --no-map --use autoprefixer cssnano",
+},
+"browserslist": [
+  "> 0.5%",
+  "not IE 11",
+  "not dead"
+],
+```
 
 ### Pipeline JS
 
-- webpack
-- esbuild
+Même si les modules JS commencent à être bien supportés et même si HTTP/2 aide également, il est encore utile de bundler (rassembler en une seul fichier) et de minifier votre code JavaScript.
+
+Même si il est assez facile d'utiliser [webpack](https://webpack.js.org/) et un fichier de configuration, [esbuild](https://esbuild.github.io/) (et ES6) sont des alternatives intéressantes pour la plupart de vos projets, spécialement si vous les utilisez uniquement pour JavaScript.
+
+```json
+"scripts": {
+  "styles:dev": "sass --embed-source-map --source-map-urls=absolute \"src/scss/main.scss\" \"dist/css/styles.css\"",
+  "styles:prod": "sass --no-source-map \"src/scss/main.scss\" \"dist/css/styles.css\"",
+  "poststyles:prod": "postcss \"dist/css/styles.css\" --replace --no-map --use autoprefixer cssnano",
+  "scripts:prod": "esbuild \"src/js/main.js\" --target=\"es6\" --bundle --minify --outfile=\"dist/js/main.bundle.js\"",
+  "scripts:dev": "esbuild \"src/js/main.js\" --target=\"es6\" --bundle --outfile=\"dist/js/main.bundle.js\""
+},
+"browserslist": [
+  "> 0.5%",
+  "not IE 11",
+  "not dead"
+],
+```
+
+## Clear, build, watch et rechargement automatique
+
+En phase de développement, les divers fichiers de destination (CSS, JavaScript et assets) sont générés automatiquement à chaque fois une modification des divers fichiers est détectée. C'est ce que l'on appelle les opération de watch. Certains packages disposent d'un flag `--watch` et d'autres pas forcément. Nous utiliserons [`onchange`](https://www.npmjs.com/package/onchange) pour monitorer certains dossiers et exécuter certains scripts en conséquence.
+
+Ces tâches et scripts peuvent être activés séquentiellement ou en parallèle. Nous utiliserons [`npm-run-all`](https://www.npmjs.com/package/npm-run-all) pour cela.
+
+Il est également courant de disposer d'un petit serveur local ([Browsersync](https://browsersync.io/) dans ce cas-ci) permettant de recharger automatiquement les pages dans le navigateur à chaque modification des fichiers sources et de tester ses projets sur plusieurs plateformes simultanément.
+
+Vous aurez souvent besoin de copier des fichiers (fonts, etc) depuis un dossier source vers une dossier de destination. [`copyfiles`](https://www.npmjs.com/package/copyfiles) est un outil très efficace pour cela.
+
+Avant la phase de build, il est courant de supprimer l'ensemble des fichiers de destination. Nous utiliserons [rimraf](https://www.npmjs.com/package/rimraf) pour exécuter cette tâche.
+
+```json
+{
+  "name": "npm-scripts",
+  "version": "1.0.0",
+  "description": "Learning NPM scripts",
+  "author": "Jérôme Coupé",
+  "license": "MIT",
+  "scripts": {
+    "clear": "rimraf \"dist/\"",
+    "serve": "browser-sync start --server --no-open --files \"dist\" \"*.html\"",
+    "styles:dev": "sass --embed-source-map --source-map-urls=absolute \"src/scss/main.scss\" \"dist/css/styles.css\"",
+    "styles:prod": "sass --no-source-map \"src/scss/main.scss\" \"dist/css/styles.css\"",
+    "poststyles:prod": "postcss \"dist/css/styles.css\" --replace --no-map --use autoprefixer cssnano",
+    "scripts:prod": "esbuild \"src/js/main.js\" --target=es6 --bundle --minify --outfile=\"dist/js/main.bundle.js\"",
+    "scripts:dev": "esbuild \"src/js/main.js\" --target=es6 --bundle --outfile=\"dist/js/main.bundle.js\"",
+    "watch:styles": "onchange \"src/scss/**/*.scss\" -- npm run styles:dev",
+    "watch:scripts": "onchange \"src/js/**/*.js\" -- npm run scripts:dev",
+    "copy:fonts": "copyfiles -u 1 \"src/fonts/*\" \"dist/\"",
+    "copy": "npm-run-all --parallel copy:*",
+    "watch": "npm-run-all --parallel serve watch:*",
+    "build": "npm-run-all clear --parallel styles:prod scripts:prod images copy"
+  },
+  "browserslist": [
+    "> 0.5%",
+    "not IE 11",
+    "not dead"
+  ],
+  "devDependencies": {
+    "autoprefixer": "^10.4.0",
+    "browser-sync": "^2.27.5",
+    "copyfiles": "^2.4.1",
+    "cssnano": "^5.0.9",
+    "esbuild": "^0.13.12",
+    "glob": "^7.2.0",
+    "npm-run-all": "^4.1.5",
+    "onchange": "^7.1.0",
+    "postcss-cli": "^9.0.1",
+    "rimraf": "^3.0.2",
+    "sass": "^1.43.4",
+    "sharp": "^0.29.2"
+  }
+}
+```
 
 ## Scripts externes
 
-- Images et Sharp
+Il est aussi possible de faire tourner des scripts Node externes à l'aide de scripts NPM.
 
-## Build, watch et livereload
+```json
+"scripts": {
+  "external": "node \"build_tasks/myscript.js\"",
+}
+```
 
-- Build
-- Watch, scripts séquentiels et scripts parallèles avec `npm run all`
-- Livereload avec browser-sync (mentionner alternatives)
-
-## Exemple final
-
-- `package.json` final et comments
+De tels scripts externes peuvent par exemple être utilisés en combinaison avec des Static Sites Generators pour [créer différentes versions optimisées de vos images](https://github.com/jeromecoupe/webstoemp/blob/master/build_tasks/transform-images.js) lors du build.
