@@ -37,7 +37,7 @@ Nous devrons également installer un certain nombre de packages NPM utilisés pa
 - `npm install [package(s)]` ou `npm i [package(s)]`: installe les packages nécessaires en production
 - `npm install [package(s)] --save-dev` ou `npm i -D [package(s)]`: installe les packages nécessaires uniquement en développement local et pour des tests
 
-*Exemple: la commande `NPM i -D browser-sync` installera BrowserSync comme dépendance de développement et spécifiera une plage des versions de ce package pouvant être utilisées dans le fichier `package.json`.*
+_Exemple: la commande `NPM i -D browser-sync` installera BrowserSync comme dépendance de développement et spécifiera une plage des versions de ce package pouvant être utilisées dans le fichier `package.json`._
 
 - `npm uninstall [package(s)]`: vous permet de désinstaller un ou plusieurs packages NPM.
 - `npm outdated` ou `npm outdated [package(s)]`: vous permet de voir quelle est la dernière version stable d'un ou plusieurs packages installés
@@ -49,12 +49,12 @@ La propriété [`scripts`](https://docs.npmjs.com/cli/v7/using-npm/scripts) du f
 ```json
 {
   "scripts": {
-    "styles": "sass src/assets/scss/main.scss dist/assets/css/main.css",
+    "styles": "sass src/assets/scss/main.scss dist/assets/css/main.css"
   }
 }
 ```
 
-*Exemple: le script ci-dessus pourra être exécuté avec la commande `npm run styles` et aura pour effet de compiler le contenu du fichier source `main.scss` vers le fichier de destination `main.css`*
+_Exemple: le script ci-dessus pourra être exécuté avec la commande `npm run styles` et aura pour effet de compiler le contenu du fichier source `main.scss` vers le fichier de destination `main.css`_
 
 NPM offre des commandes courtes pour certains scripts très utilisés:
 
@@ -88,14 +88,9 @@ Pour cela, j'utilise personnellement la notation suivante:
   "description": "Learning NPM scripts",
   "scripts": {
     "styles:dev": "sass --watch --embed-source-map --source-map-urls=absolute \"src/scss/main.scss\" \"dist/css/styles.css\"",
-    "styles:prod": "sass --no-source-map \"src/scss/main.scss\" \"dist/css/styles.css\"",
+    "styles:prod": "sass --no-source-map \"src/scss/main.scss\" \"dist/css/styles.css\""
   },
-  "keywords": [
-    "NPM Scripts",
-    "asset pipeline",
-    "build",
-    "watch"
-  ],
+  "keywords": ["NPM Scripts", "asset pipeline", "build", "watch"],
   "author": "Jérôme Coupé",
   "license": "MIT",
   "devDependencies": {
@@ -136,7 +131,6 @@ En production, nous devons également compiler notre code Scss et obtenir un fic
 ```
 
 Autoprefixer ayant besoin de savoir quels navigateurs et quelles versions supporter, nous pouvons ajouter une [query browserslist](https://github.com/browserslist/browserslist) à notre `package.json`. Voici celle que j'utilise habituellement.
-
 
 ```json
 "scripts": {
@@ -204,13 +198,10 @@ Avant la phase de build, il est courant de supprimer l'ensemble des fichiers de 
     "copy:fonts": "copyfiles -u 1 \"src/fonts/*\" \"dist/\"",
     "copy": "npm-run-all --parallel copy:*",
     "watch": "npm-run-all --parallel serve watch:*",
-    "build": "npm-run-all clear --parallel styles:prod scripts:prod images copy"
+    "build": "npm-run-all clear --parallel styles:prod scripts:prod images copy",
+    "dev": "npm run watch"
   },
-  "browserslist": [
-    "> 0.5%",
-    "not IE 11",
-    "not dead"
-  ],
+  "browserslist": ["> 0.5%", "not IE 11", "not dead"],
   "devDependencies": {
     "autoprefixer": "^10.4.0",
     "browser-sync": "^2.27.5",
