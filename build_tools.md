@@ -6,21 +6,21 @@ Le développement front-end est aujourd'hui relativement complexe et disposer d'
 
 Ces opérations concernent les trois grands langages du web (HTML/CSS/JS) ainsi que les assets (images, videos, etc.).
 
-- CSS: rassembler une série de petits fichiers Sass ou CSS en un seul fichier optimisé (bundling), éliminer en production les règles CSS non utilisées, valider le code CSS (linting), etc.
-- JavaScript: rassembler plusieurs fichiers en un seul fichier optimisé (bundling), automatiser la transformation de code plus moderne vers du code pouvant être utilisé par des navigateurs plus anciens (transpiling), éliminer du code de production les parties de code qui ne sont pas utilisées (tree-shaking), valider le code JavaScript (linting), vérifier que votre code passe une série de tests (testing), etc.
-- Images: optimisation et génération de formats, création de sprites, etc.
+- CSS: rassembler une série de petits fichiers Scss ou CSS en un seul fichier optimisé (bundling), éliminer en production les règles CSS non utilisées, valider le code CSS (linting), etc.
+- JavaScript: rassembler plusieurs fichiers en un seul fichier optimisé (bundling), automatiser la transformation de code moderne vers du code pouvant être utilisé par des navigateurs plus anciens (transpiling), éliminer du code de production les parties de code qui ne sont pas utilisées (tree-shaking), valider le code JavaScript (linting), vérifier que votre code passe une série de tests (testing), etc.
+- Images: optimisation et génération de différentes tailles et formats, création de sprites, etc.
 
 Nous nous concentrerons ici sur l'utilisation des scripts NPM qui permettent, via un fichier `package.json` et la commande `npm run [script name]`, de centraliser et d'exécuter scripts d'invite de commande.
 
 Au niveau des avantages, les scripts NPM permettent d'utiliser l'ensemble du (très) large écosystème des packages NPM, de spécifier l'ordre d'exécution de vos différents scripts et commandes, et même d'en faire tourner certains en parallèle ou en série. Le fait de travailler avec des packages natifs est aussi un avantage, comparé à des solutions comme grunt ou gulp qui doivent passer par des wrappers propre à ces outils de build.
 
-Si vous devez construire un build pipeline complexe, utiliser un ensemble de scripts en ligne de commande qui doivent être exécuté dans un ordre spécifique peut devenir plus difficile. Certains critiquent également le caractère peu lisible de ces scripts et la difficulté de commenter un fichier JSON tel que `package.json`.
+Si vous devez construire un build pipeline complexe, utiliser un ensemble de scripts en ligne de commande qui doivent être exécutés dans un ordre spécifique peut devenir plus difficile. Certains critiquent également le caractère peu lisible de ces scripts et la difficulté de commenter un fichier JSON tel que `package.json`.
 
 ## NPM scripts
 
 ### Création d'un package.json
 
-Les scripts NPM sont donc essentiellement une façon de centraliser et d'exécuter des scripts d'invite de commande. Ils sont initialement prévu pour fonctionner dans un écosystème NodeJS mais peuvent également être utilisés dans le contexte plus large du développement web.
+Les scripts NPM sont donc essentiellement une façon de centraliser et d'orchestrer l'exécution des scripts d'invite de commande. Ils sont initialement prévu pour fonctionner dans un écosystème NodeJS mais peuvent être utilisés dans le contexte plus large du développement web.
 
 Pour commencer à travailler, nous devons [installer NodeJS et NPM](https://docs.npmjs.com/downloading-and-installing-node-js-and-npm) et créer un fichier `package.json` qui reprendra toutes nos dépendances Node et nous permettra d'écrire et d'exécuter des scripts.
 
@@ -61,7 +61,7 @@ NPM offre des commandes courtes pour certains scripts très utilisés:
 - `npm start` équivaut à `npm run start`
 - `npm test` équivaut à `npm run test`
 
-Les prefixes `pre` et `post` placé avant le nom d'un script existant ou d'un script par défaut permettent de créer de nouveaux scripts qui seront exécuté automatiquement avant ou après le script existant.
+Les prefixes `pre` et `post` placé avant le nom d'un script existant ou d'un script par défaut permettent de créer de nouveaux scripts qui seront exécutés automatiquement avant ou après le script existant.
 
 ```json
 {
@@ -77,7 +77,7 @@ Il existe également des packages NPM comme [`npm-run-all`](https://www.npmjs.co
 
 ### Développement et production
 
-Il se peut que vous ayez besoin de deux version différentes du même script suivant que vous soyez en développement ou en production. Par exemple, vous souhaitez avec des sourcemaps pour votre compilation CSS en développement mais pas en production
+Il se peut que vous ayez besoin de deux versions différentes du même script suivant que vous soyez en développement ou en production. Par exemple, vous souhaitez disposer de sourcemaps pour votre compilation CSS en développement mais pas en production
 
 Pour cela, j'utilise personnellement la notation suivante:
 
@@ -99,13 +99,13 @@ Pour cela, j'utilise personnellement la notation suivante:
 }
 ```
 
-Typiquement, `styles:prod` sera exécuté lors du passage en production, tandis que `styles:dev` sera pour sa part utilisé en développement.
+Typiquement, `styles:prod` est exécuté lors du passage en production, tandis que `styles:dev` est utilisé en développement.
 
 ## Exemple concret
 
-Nous allons maintenant créer ensemble un asset pipeline assez classique qui devra remplir les missions suivantes:
+Nous allons maintenant créer ensemble un asset pipeline classique qui devra remplir les missions suivantes:
 
-- Compiler du code [Sass](https://sass-lang.com) en un seul fichier CSS, utiliser [postCSS](https://postcss.org/) et les plugins [autoprefixer](https://github.com/postcss/autoprefixer) et [cssnano](https://github.com/cssnano/cssnano) pour ajouter les vendor prefixes et minifier la css finale.
+- Compiler du code [Sass](https://sass-lang.com) en un seul fichier CSS, utiliser [postCSS](https://postcss.org/) et les plugins [autoprefixer](https://github.com/postcss/autoprefixer) et [cssnano](https://github.com/cssnano/cssnano) pour ajouter les vendor prefixes et minifier la CSS finale.
 - Bundler nos modules JavaScript en un seul fichier et transpiler le tout vers de l'ES6 avec [esbuild](https://esbuild.github.io/)
 - Optimiser nos images et utiliser un script externe et la librairie [Sharp](https://github.com/lovell/sharp) pour générer des thumbnails aux dimensions et formats voulus.
 
@@ -149,7 +149,7 @@ Autoprefixer ayant besoin de savoir quels navigateurs et quelles versions suppor
 
 Même si les modules JS commencent à être bien supportés et même si HTTP/2 aide également, il est encore utile de bundler (rassembler en une seul fichier) et de minifier votre code JavaScript.
 
-Même si il est assez facile d'utiliser [webpack](https://webpack.js.org/) et un fichier de configuration, [esbuild](https://esbuild.github.io/) (et ES6) sont des alternatives intéressantes pour la plupart de vos projets, spécialement si vous les utilisez uniquement pour JavaScript.
+Même si il est assez facile d'utiliser [Webpack](https://webpack.js.org/) et un fichier de configuration, [esbuild](https://esbuild.github.io/) (et ES6) sont des alternatives intéressantes pour la plupart de vos projets, spécialement si vous les utilisez uniquement pour JavaScript.
 
 ```json
 "scripts": {
@@ -174,7 +174,7 @@ Ces tâches et scripts peuvent être activés séquentiellement ou en parallèle
 
 Il est également courant de disposer d'un petit serveur local ([Browsersync](https://browsersync.io/) dans ce cas-ci) permettant de recharger automatiquement les pages dans le navigateur à chaque modification des fichiers sources et de tester ses projets sur plusieurs plateformes simultanément.
 
-Vous aurez souvent besoin de copier des fichiers (fonts, etc) depuis un dossier source vers une dossier de destination. [`copyfiles`](https://www.npmjs.com/package/copyfiles) est un outil très efficace pour cela.
+Vous aurez souvent besoin de copier des fichiers (fonts, etc) depuis un dossier source vers une dossier de destination. [`copyfiles`](https://www.npmjs.com/package/copyfiles) est un outil très efficace pour ce faire.
 
 Avant la phase de build, il est courant de supprimer l'ensemble des fichiers de destination. Nous utiliserons [rimraf](https://www.npmjs.com/package/rimraf) pour exécuter cette tâche.
 
